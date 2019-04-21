@@ -31,31 +31,14 @@ class BookspiderSpider(scrapy.Spider):
         if response.url in self.targetUrls:
             repositoryLiList = response.xpath("//ul[@class='repo-list']/li")
             for repositoryLi in repositoryLiList:
-                # # 取得倉庫名稱
-                # repositoryName = "".join(repositoryLi.xpath("./div/h3/a").xpath("string(.)").extract()).strip()
-                # # print(repositoryName)
-
                 # 取得倉庫連結
                 repositoryURL = "".join(repositoryLi.xpath("./div/h3/a/@href").extract()).strip()
-                # print(repositoryURL)
-
-                # # 取得倉庫描述
-                # repositoryDescription = "".join(repositoryLi.xpath("./div/p").xpath("string(.)").extract()).strip()
-                # # print(repositoryDescription)
-                #
-                # # 取得倉庫star
-                # repositoryStars = "".join(repositoryLi.xpath("./div[2]/div[2]/a/text()").extract()).strip()
-                # # print(repositoryStars)
-
                 yield scrapy.Request("http://github.com" + repositoryURL, callback=self.parse)
         else:  # 倉庫詳細頁
             repositoryBody = response.xpath("//tbody/tr")
             repositoryBody.pop(0)  # 第一個td不是想要的
             repositoryName = "".join(response.xpath("//main/div/div/h1").xpath("string(.)").extract()).strip()
-            # repositoryDescription = "".join(response.xpath("//main/div[2]/div/div/div/span").xpath("string(.)").extract()).strip()
-            # repositoryStars = "".join(response.xpath("//main/div/div/ul/li[2]/div/form[2]/a").xpath("string(.)").extract()).strip()
             bookList = []
-            # print(repositoryName)
             for tdTag in repositoryBody:
                 isDirectory = "directory" == "".join(
                     tdTag.xpath("./td[@class='icon']/svg/@aria-label").extract()).strip()
